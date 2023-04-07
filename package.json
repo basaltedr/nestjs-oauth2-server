@@ -1,11 +1,10 @@
 {
-  "name": "@t00nday/nestjs-oauth2-server",
-  "version": "0.0.4",
+  "name": "@dieyne/nestjs-oauth2-server",
+  "version": "0.0.2",
   "description": "A Nestjs wrapper for oauth2-server",
   "main": "index.js",
-  "type": "module",
   "types": "index.d.ts",
-  "author": "B'Tunde Aromire",
+  "author": "Dieyné Dramé",
   "keywords": [
     "nestjs oauth2 server",
     "nestjs oauth2",
@@ -73,11 +72,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/toondaey/nestjs-oauth2-server.git"
+    "url": "git+https://github.com/dieyne/nestjs-oauth2-server.git"
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/toondaey/nestjs-oauth2-server/issues"
+    "url": "https://github.com/dieyne/nestjs-oauth2-server/issues"
   },
   "husky": {
     "hooks": {
@@ -91,7 +90,7 @@
     "reflect-metadata": "^0.1.12",
     "rxjs": "^7.0.0"
   },
-  "homepage": "https://github.com/toondaey/nestjs-oauth2-server#readme",
+  "homepage": "https://github.com/dieyne/nestjs-oauth2-server#readme",
   "publishConfig": {
     "access": "public"
   }

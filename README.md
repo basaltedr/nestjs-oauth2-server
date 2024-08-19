@@ -60,22 +60,70 @@ import { OAuth2ServerModule } from '@dieyne/nestjs-oauth2-server';
 export class AppModule {}
 ```
 
-In addition to the above the, **oauth2-server** requires a [model](https://oauth2-server.readthedocs.io/en/latest/model/overview.html) to create the server. This can be provided as a service from any part of the application. This should be able to fetch data about clients, users, token, and authorization codes. This **MUST** be a service decorated with the `OAuth2Model` decorator.
+In addition to the above the, **oauth2-server** requires a [model](https://oauth2-server.readthedocs.io/en/latest/model/overview.html) to create the server. This can be provided as a service 
 
 ```ts
-import { OAuth2Model } from '@dieyne/nestjs-oauth2-server';
+import { Global, Module } from '@nestjs/common';
+import { OAuth2ServerModule } from '@dieyne/nestjs-oauth2-server';
+import { OAuth2ServerController } from '../controller/oauth2-server.controller';
+import { ModelForOAuth2Module } from './model-for-oauth2.module';
+import { ModelForOAuth2Service } from 'src/service/model-for-oauth2.service';
 
-@OAuth2Model()
-export class OAuth2ModelService
-    implements RequestAuthenticationModel
-{
-    getAccessToken() {}
+@Module({
+  imports: [
+    OAuth2ServerModule.forRootAsync(
+      {
+        useFactory: () => ({
+          requireClientAuthentication: true,
+          accessTokenLifetime: 60 * 60 * 12,
+          refreshTokenLifetime: 60 * 60 * 14,
+          authorizationCodeLifetime: 60 * 60,
+        }),
+      },
+      {
+        useFactory(modelService) {
+          return modelService;
+        },
+        inject: [ModelForOAuth2Service],
+        imports: [ModelForOAuth2Module],
+      },
+    ),
+  ],
+  providers: [],
+  exports: [],
+  controllers: [OAuth2ServerController],
+})
+@Global()
+export class MyOAuth2ServerModule {}
 
-    verifyScope() {}
-    // ...
+@Injectable()
+export class ModelForOAuth2Service implements RefreshTokenModel {
+  constructor(
+    // inject others services here
+  ) {}
 }
-```
 
+@Module({
+  imports: [
+    // others modules here
+  ],
+  providers: [ModelForOAuth2Service],
+  exports: [ModelForOAuth2Service],
+})
+export class ModelForOAuth2Module {}
+
+// if ModelForOAuth2Service don't have any dependancies, you can use
+@Module({
+  imports: [
+    OAuth2ServerModule.forRoot({
+      requireClientAuthentication: true,
+      accessTokenLifetime: 60 * 60 * 12,
+      refreshTokenLifetime: 60 * 60 * 14,
+      authorizationCodeLifetime: 60 * 60,
+    }, ModelForOAuth2Service)]
+)}
+export class ModelForOAuth2Module {}
+```
 ## Usage
 
 The module also provides some nifty decorators to help with configuring the oauth2 handler endpoints. An example controller covering the entire array of decorators is given below

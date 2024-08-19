@@ -6,7 +6,9 @@ import {
     RefreshTokenModel,
     AuthorizationCodeModel,
     RequestAuthenticationModel,
-} from 'oauth2-server';
+    Falsey,
+    User,
+} from '@node-oauth/oauth2-server';
 import moment = require('moment');
 import { Inject, Injectable, Optional } from '@nestjs/common';
 
@@ -16,11 +18,9 @@ import {
     REFRESH_TOKEN,
     AUTHORIZATION_CODE,
 } from './data';
-import { OAuth2Model } from '../../lib';
 import { RESPONSES } from './test.constants';
 import { ITestExpectedResponses } from './test.interfaces';
 
-@OAuth2Model()
 export class TestModelService
     implements
         RequestAuthenticationModel,
@@ -96,5 +96,53 @@ export class TestModelService
 
     async revokeToken(): Promise<boolean> {
         return false;
+    }
+}
+export class TestModelService2
+    implements
+    RequestAuthenticationModel,
+    AuthorizationCodeModel,
+    RefreshTokenModel{
+    getRefreshToken(refreshToken: string): Promise<RefreshToken | Falsey> {
+        throw new Error('Method not implemented.');
+    }
+    revokeToken(token: RefreshToken): Promise<boolean> {
+        throw new Error('Method not implemented.');
+    }
+    generateRefreshToken?(client: Client, user: User, scope: string[]): Promise<string> {
+        throw new Error('Method not implemented.');
+    }
+    generateAuthorizationCode?(client: Client, user: User, scope: string[]): Promise<string> {
+        throw new Error('Method not implemented.');
+    }
+    getAuthorizationCode(authorizationCode: string): Promise<AuthorizationCode | Falsey> {
+        throw new Error('Method not implemented.');
+    }
+    saveAuthorizationCode(code: Pick<AuthorizationCode, 'authorizationCode' | 'expiresAt' | 'redirectUri' | 'scope' | 'codeChallenge' | 'codeChallengeMethod'>, client: Client, user: User): Promise<AuthorizationCode | Falsey> {
+        throw new Error('Method not implemented.');
+    }
+    revokeAuthorizationCode(code: AuthorizationCode): Promise<boolean> {
+        throw new Error('Method not implemented.');
+    }
+    validateScope?(user: User, client: Client, scope?: string[]): Promise<string[] | Falsey> {
+        throw new Error('Method not implemented.');
+    }
+    validateRedirectUri?(redirect_uri: string, client: Client): Promise<boolean> {
+        throw new Error('Method not implemented.');
+    }
+    generateAccessToken?(client: Client, user: User, scope: string[]): Promise<string> {
+        throw new Error('Method not implemented.');
+    }
+    getClient(clientId: string, clientSecret: string): Promise<Client | Falsey> {
+        throw new Error('Method not implemented.');
+    }
+    saveToken(token: Token, client: Client, user: User): Promise<Token | Falsey> {
+        throw new Error('Method not implemented.');
+    }
+    getAccessToken(accessToken: string): Promise<Token | Falsey> {
+        throw new Error('Method not implemented.');
+    }
+    verifyScope?(token: Token, scope: string[]): Promise<boolean> {
+        throw new Error('Method not implemented.');
     }
 }

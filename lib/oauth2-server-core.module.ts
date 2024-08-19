@@ -5,8 +5,16 @@ import {
     Provider,
     DynamicModule,
 } from '@nestjs/common';
-import { ServerOptions } from 'oauth2-server';
-import * as OAuth2Server from 'oauth2-server';
+import {
+    PasswordModel,
+    ExtensionModel,
+    RefreshTokenModel,
+    AuthorizationCodeModel,
+    ClientCredentialsModel,
+    RequestAuthenticationModel,
+} from '@node-oauth/oauth2-server';
+import { ServerOptions } from '@node-oauth/oauth2-server';
+import * as OAuth2Server from '@node-oauth/oauth2-server';
 
 import {
     OAuth2ServerTokenGuard,
@@ -23,15 +31,20 @@ import {
     OAUTH2_SERVER_MODEL_PROVIDER,
     OAUTH2_SERVER_OPTIONS_TOKEN,
 } from './oauth2-server.constants';
-import { ModelProviderModule } from './model-provider.module';
+import { IOAuth2Model } from './interfaces/oauth2-model.interfaces';
+import { Model } from './model';
 
 @Global()
 @Module({
-    imports: [ModelProviderModule],
+    imports: [],
     providers: [
         {
             provide: OAUTH2_SERVER_OPTIONS_TOKEN,
             useValue: {},
+        },
+        {
+            provide: OAUTH2_SERVER_MODEL_PROVIDER,
+            useClass: Model,
         },
         {
             provide: OAUTH2_SERVER,
@@ -51,11 +64,19 @@ import { ModelProviderModule } from './model-provider.module';
         OAuth2ServerAuthorizationGuard,
         OAuth2ServerAuthenticationGuard,
     ],
-    exports: [OAUTH2_SERVER],
+    exports: [OAUTH2_SERVER, OAUTH2_SERVER_MODEL_PROVIDER],
 })
 export class OAuth2ServerCoreModule {
     static forRoot(
         options: IOAuth2ServerModuleOptions,
+        modelService: Type<
+            | PasswordModel
+            | ExtensionModel
+            | RefreshTokenModel
+            | AuthorizationCodeModel
+            | ClientCredentialsModel
+            | RequestAuthenticationModel
+        >,
     ): DynamicModule {
         return {
             module: OAuth2ServerCoreModule,
@@ -64,17 +85,35 @@ export class OAuth2ServerCoreModule {
                     provide: OAUTH2_SERVER_OPTIONS_TOKEN,
                     useValue: options,
                 },
+                {
+                    provide: OAUTH2_SERVER_MODEL_PROVIDER,
+                    useClass: modelService,
+                },
             ],
         };
     }
 
     static forRootAsync(
         options: IOAuth2ServerModuleAsyncOptions,
+        modelServiceFactory: IOAuth2Model,
     ): DynamicModule {
         return {
             module: OAuth2ServerCoreModule,
-            providers: [...this.createAsyncProviders(options)],
-            imports: options.imports || [],
+            providers: [
+                ...this.createAsyncProviders(options),
+                {
+                    provide: OAUTH2_SERVER_MODEL_PROVIDER,
+                    useFactory: modelServiceFactory.useFactory,
+                    inject: modelServiceFactory.inject || [],
+                },
+            ],
+            imports: [
+                ...Object.assign(
+                    [],
+                    options.imports,
+                    modelServiceFactory.imports,
+                ),
+            ],
         };
     }
 

@@ -1,9 +1,7 @@
-import OAuth2Server = require('oauth2-server');
+import OAuth2Server = require('@node-oauth/oauth2-server');
 import { Test, TestingModule } from '@nestjs/testing';
 import { InternalServerErrorException } from '@nestjs/common';
-
 import { TestModule } from '../src/test.module';
-import { TestModelService } from '../src/test-model.service';
 import { OAUTH2_SERVER } from '../../lib/oauth2-server.constants';
 
 describe('ExampleModule', () => {
@@ -13,7 +11,7 @@ describe('ExampleModule', () => {
         beforeEach(async () => {
             module = await Test.createTestingModule({
                 imports: [TestModule.withForRoot()],
-                providers: [TestModelService],
+                providers: [],
             }).compile();
         });
 
@@ -45,7 +43,7 @@ describe('ExampleModule', () => {
                     imports: [
                         TestModule.withUseFactoryForRootAsync(),
                     ],
-                    providers: [TestModelService],
+                    providers: [],
                 }).compile();
 
                 expect(
@@ -58,7 +56,7 @@ describe('ExampleModule', () => {
             it('should register module', async () => {
                 module = await Test.createTestingModule({
                     imports: [TestModule.withUseClassForRootAsync()],
-                    providers: [TestModelService],
+                    providers: [],
                 }).compile();
 
                 expect(
@@ -71,9 +69,9 @@ describe('ExampleModule', () => {
             it('should register module', async () => {
                 module = await Test.createTestingModule({
                     imports: [
-                        TestModule.withUseExistingForRootAsync(),
+                        TestModule.withUseExistingForRootAsync()
                     ],
-                    providers: [TestModelService],
+                    providers: [],
                 }).compile();
 
                 expect(
